@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bihar SC/ST Welfare Teachers Association</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f6; padding: 15px; margin: 0; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        
+        .header-section { text-align: center; margin-bottom: 15px; padding-top: 10px; }
+        h2 { color: #333; margin-bottom: 5px; font-size: 1.5em; margin-top: 0; }
+        h4 { color: #007bff; margin-top: 0; font-size: 1.1em; }
+        
+        .join-btn-container { text-align: center; margin: 20px 0; }
+        .join-btn { display: inline-block; background-color: #e83e8c; color: white; padding: 12px 20px; text-decoration: none; border-radius: 30px; font-weight: bold; font-size: 1em; box-shadow: 0 4px 6px rgba(0,0,0,0.15); transition: 0.3s; width: 85%; max-width: 400px; }
+        .join-btn:hover { background-color: #d81b60; box-shadow: 0 6px 8px rgba(0,0,0,0.2); transform: translateY(-2px); }
+
+        .filters { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; background: #eef2f5; padding: 15px; border-radius: 8px; border: 1px solid #dcdcdc; }
+        .filter-group { flex: 1; min-width: 100%; } 
+        @media(min-width: 600px) { .filter-group { min-width: 200px; } }
+        
+        label { font-weight: bold; display: block; margin-bottom: 5px; color: #444; font-size: 0.9em; }
+        select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; outline: none; background: white; }
+        select:focus { border-color: #007bff; box-shadow: 0 0 5px rgba(0,123,255,0.3); }
+        select:disabled { background-color: #e9ecef; cursor: not-allowed; }
+        
+        .status-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; gap: 10px; }
+        @media(min-width: 600px) { .status-container { flex-direction: row; justify-content: space-between; } }
+        
+        .live-badge { font-size: 0.85em; color: #155724; background: #d4edda; padding: 5px 10px; border-radius: 20px; border: 1px solid #c3e6cb; }
+        .offline-badge { font-size: 0.85em; color: #856404; background: #fff3cd; padding: 5px 10px; border-radius: 20px; border: 1px solid #ffeeba; }
+        .fetching-badge { font-size: 0.85em; color: #004085; background: #cce5ff; padding: 5px 10px; border-radius: 20px; border: 1px solid #b8daff; }
+        
+        .counts-wrapper { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        
+        #instructionMsg { text-align: center; color: #666; font-size: 1em; padding: 20px; border: 2px dashed #ccc; border-radius: 8px; margin-top: 10px; background: #fafafa; }
+        
+        #tableContainer { display: none; overflow-x: auto; max-height: 500px; margin-top: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .count-info { font-weight: bold; color: #007bff; font-size: 1em; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; font-size: 0.9em; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #007bff; color: white; position: sticky; top: 0; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.4); z-index: 2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+
+        .correction-box { background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin-top: 30px; margin-bottom: 20px; }
+        .correction-box h5 { margin: 0 0 10px 0; color: #856404; font-size: 1em; line-height: 1.4; }
+        
+        /* New Information Text Style */
+        .info-text { font-size: 0.9em; color: #d32f2f; font-weight: bold; margin-bottom: 10px; display: block; }
+        
+        .correction-inputs { display: flex; gap: 10px; flex-wrap: wrap; }
+        .correction-inputs input { padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 100px; font-size: 14px; flex-grow: 1; }
+        .correction-inputs textarea { padding: 10px; border: 1px solid #ccc; border-radius: 4px; flex: 3; min-width: 200px; font-size: 14px; resize: vertical; }
+        .correction-inputs button { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; flex-grow: 1; }
+        .correction-inputs button:hover { background: #218838; }
+        #correctionStatus { font-weight: bold; width: 100%; text-align: center; margin-top: 5px; font-size: 0.9em; }
+        
+        .dev-credit { text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e0e0e0; font-size: 0.9em; color: #555; line-height: 1.6; }
+        .suggestion-box { background: #eef2f5; padding: 10px; border-radius: 5px; margin-bottom: 15px; display: inline-block; color: #333; border: 1px solid #dcdcdc; }
+        .dev-credit span.name { font-weight: bold; color: #007bff; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-section">
+        <h2>Bihar SC/ST Welfare Teachers Association</h2>
+        <h4>शिक्षक खोज पोर्टल</h4>
+    </div>
+    
+    <div class="join-btn-container">
+        <a href="https://forms.gle/qmj3Poi5UzKZQqGQ7" target="_blank" class="join-btn">📝 इस पोर्टल पर जुड़ने के लिए यहाँ क्लिक करें</a>
+    </div>
+
+    <div class="status-container">
+        <span id="liveStatus" class="fetching-badge">⏳ Live डाटा खोजा जा रहा है...</span>
+        <div class="counts-wrapper">
+            <span id="totalSchools" class="fetching-badge" style="background: #e2e3e5; color: #383d41; border-color: #d6d8db; font-weight: bold;">कुल पंजीकृत स्कूल: 0</span>
+            <span id="totalTeachers" class="fetching-badge" style="background: #e2e3e5; color: #383d41; border-color: #d6d8db; font-weight: bold;">कुल पंजीकृत शिक्षक: 0</span>
+        </div>
+    </div>
+
+    <div id="mainContent">
+        <div class="filters">
+            <div class="filter-group">
+                <label for="pramandal">प्रमंडल चुनें:</label>
+                <select id="pramandal" onchange="filterData('pramandal')">
+                    <option value="All">-- पहले प्रमंडल चुनें --</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="district">जिला चुनें:</label>
+                <select id="district" onchange="filterData('district')" disabled>
+                    <option value="All">-- जिला चुनें --</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="school">स्कूल चुनें:</label>
+                <select id="school" onchange="filterData('school')" disabled>
+                    <option value="All">-- स्कूल चुनें --</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="instructionMsg">
+            👆 कृपया शिक्षकों की सूची देखने के लिए ऊपर <b>प्रमंडल</b>, <b>जिला</b> और <b>स्कूल</b> चुनें।
+        </div>
+
+        <div id="tableContainer">
+            <div class="count-info" id="countInfo">कुल शिक्षक: 0</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Reg.<br>Sl No.</th>
+                        <th>शिक्षक का नाम</th>
+                        <th>पदनाम</th>
+                        <th>स्कूल का नाम</th>
+                        <th>जिला</th>
+                        <th>प्रमंडल</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="correction-box">
+        <h5>🛠️ क्या आपके डेटा में कोई गलती है? नीचे अपना 'Registration Sl No.' और सही जानकारी लिखकर भेजें:</h5>
+        <span class="info-text">👉 अपना 'Registration Sl No.' जानने के लिए ऊपर अपना नाम सर्च करके बाईं ओर देखें।</span>
+        
+        <div class="correction-inputs">
+            <input type="number" id="corrRow" placeholder="Sl No." min="1" required>
+            <textarea id="corrText" rows="2" placeholder="जैसे: मेरा नाम गलत स्कूल में दिखा रहा है..." required></textarea>
+            <button onclick="sendCorrection()" id="corrBtn">सुधार भेजें 🚀</button>
+            <div id="correctionStatus"></div>
+        </div>
+    </div>
+    
+    <div class="dev-credit">
+        <div class="suggestion-box">
+            💡 <strong>सुझाव एवं सहायता:</strong> अपने सुझाव हमें <a href="mailto:bswta.bihar@gmail.com" style="color: #007bff; text-decoration: none; font-weight: bold;">bswta.bihar@gmail.com</a> पर मेल करें।
+        </div>
+        <br>
+        Developed & Designed by<br>
+        <span class="name">बिहार एससी_एसटी कल्याण शिक्षक संघ सदस्य</span>
+    </div>
+</div>
+
+<script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbznQFYw0MghBENlilP2cAu2PMpLzi0W4RCfjGuvvhxyQMdeP1sMbeySmBhooBZtzKG9/exec"; 
+    const GOOGLE_SHEET_ID = "18EazcZT9IFC3TrtzmiwyGAPAohl-pkw5ccI1m0O9b6g";
+
+    function sendCorrection() {
+        let userSlNo = document.getElementById('corrRow').value;
+        let text = document.getElementById('corrText').value;
+        let btn = document.getElementById('corrBtn');
+        let status = document.getElementById('correctionStatus');
+
+        if(userSlNo === "" || text.trim() === "") {
+            alert("कृपया Registration Sl No. और सुधार की जानकारी दोनों भरें!");
+            return;
+        }
+
+        let targetItem = allData.find(item => item.slNo == userSlNo);
+        let actualExcelRow = targetItem ? targetItem.sheetRowNo : null;
+
+        if(!actualExcelRow) {
+            status.style.color = "red";
+            status.innerText = "❌ यह Sl No. डेटाबेस में नहीं मिला। कृपया सही नंबर डालें!";
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "भेजा जा रहा है...";
+        status.style.color = "blue";
+        status.innerText = "कृपया प्रतीक्षा करें...";
+
+        let finalUrl = WEB_APP_URL + "?rowNo=" + actualExcelRow + "&correction=" + encodeURIComponent(text);
+
+        fetch(finalUrl)
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === "success") {
+                status.style.color = "green";
+                status.innerText = "✅ सुधार रिक्वेस्ट सफलतापूर्वक भेज दी गई है!";
+                document.getElementById('corrRow').value = "";
+                document.getElementById('corrText').value = "";
+            } else {
+                status.style.color = "red";
+                status.innerText = "❌ कुछ गड़बड़ है। फिर से प्रयास करें।";
+            }
+        })
+        .catch(error => {
+            status.style.color = "red";
+            status.innerText = "❌ इंटरनेट समस्या या लिंक गलत है!";
+            console.error(error);
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerText = "सुधार भेजें 🚀";
+            setTimeout(() => { status.innerText = ""; }, 5000);
+        });
+    }
+
+    let allData = []; 
+    
+    function getUniqueSchoolsCount(data) {
+        let uniqueSchools = new Set(data.map(item => item.school));
+        return uniqueSchools.size;
+    }
+
+    window.google = {
+        visualization: {
+            Query: {
+                setResponse: function(response) {
+                    processLiveData(response);
+                }
+            }
+        }
+    };
+
+    window.onload = function() {
+        populateDropdown('pramandal', 'pramandal', allData, 'All', '-- पहले प्रमंडल चुनें --');
+        
+        let script = document.createElement('script');
+        script.src = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:json`;
+        document.body.appendChild(script);
+        
+        setTimeout(() => {
+            let status = document.getElementById('liveStatus');
+            if (status.innerText.includes("खोजा जा रहा")) {
+                status.className = "offline-badge";
+                status.innerHTML = '🔴 डाटा नहीं मिला। कृपया चेक करें कि आपकी Google Sheet "Anyone with the link" पर सेट है या नहीं।';
+            }
+        }, 10000); 
+    };
+
+    function processLiveData(json) {
+        try {
+            if(json.status === "error") {
+                document.getElementById('liveStatus').className = "offline-badge";
+                document.getElementById('liveStatus').innerHTML = '🔴 डाटा लोड नहीं हो पाया (Google Sheet प्राइवेट है, इसे Public करें)';
+                return;
+            }
+
+            let cols = json.table.cols.map(c => c ? c.label : "");
+            let data = [];
+            
+            json.table.rows.forEach(row => {
+                let rowData = {};
+                row.c.forEach((cell, i) => {
+                    rowData[cols[i]] = cell && cell.v !== null ? cell.v : "";
+                });
+                data.push(rowData);
+            });
+
+            let newData = data.map((row, originalIndex) => {
+                let slNo = "", pramandal = "", district = "", school = "", teacher = "", post = "";
+                
+                for (let key in row) {
+                    let rawKey = String(key).trim();
+                    let cleanKey = rawKey.toLowerCase().replace(/\./g, '').replace(/\s/g, ''); 
+                    
+                    // Fixed matching logic based on the screenshot issues
+                    if (cleanKey.includes('slno') || cleanKey.includes('serial') || cleanKey.includes('क्र')) {
+                        slNo = String(row[key]).trim();
+                    } else if (rawKey.includes('प्रमंडल')) {
+                        pramandal = String(row[key]).trim();
+                    } else if (rawKey.includes('जिला') && (rawKey.includes('स्कूल') || rawKey.includes('आवासीय'))) {
+                        district = String(row[key]).trim();
+                    } else if (rawKey.includes('स्कूल का नाम') || rawKey.includes('विद्यालय का नाम') || (rawKey.includes('स्कूल') && !rawKey.includes('जिला'))) {
+                        school = String(row[key]).trim();
+                    } else if (rawKey.includes('शिक्षक का नाम') || rawKey.includes('शिक्षक का पूरा नाम') || rawKey === 'नाम') {
+                        teacher = String(row[key]).trim();
+                    } else if (rawKey.includes('पदनाम') || rawKey.includes('विद्यालय अध्यापक') || rawKey.includes('Post')) {
+                        post = String(row[key]).trim();
+                    }
+                }
+                
+                // Fallback: If 'teacher' is still 'N/A' but we have data that looks like a name, or if post has the name
+                // Based on your screenshot, it seems the name was going into 'post' or vice-versa due to column header naming
+                if (teacher === "N/A" && post !== "N/A" && !post.includes('अध्यापक')) {
+                     // Swap them if it looks like they got crossed
+                     teacher = post;
+                     post = "N/A";
+                }
+                
+                return {
+                    sheetRowNo: originalIndex + 2, 
+                    slNo: slNo || (originalIndex + 1), 
+                    pramandal: pramandal || "N/A",
+                    district: district || "N/A",
+                    school: school || "N/A",
+                    teacher: teacher || "N/A",
+                    post: post || "N/A"
+                };
+            }).filter(item => item.teacher !== "" && item.teacher !== "N/A"); 
+
+            if(newData.length > 0) {
+                let currP = document.getElementById('pramandal').value;
+                let currD = document.getElementById('district').value;
+                let currS = document.getElementById('school').value;
+
+                allData = newData; 
+                document.getElementById('liveStatus').className = "live-badge";
+                document.getElementById('liveStatus').innerHTML = '🟢 Live Data Connected';
+                
+                document.getElementById('totalTeachers').innerText = 'कुल पंजीकृत शिक्षक: ' + allData.length;
+                document.getElementById('totalTeachers').style.background = '#d4edda';
+                document.getElementById('totalTeachers').style.color = '#155724';
+                document.getElementById('totalTeachers').style.borderColor = '#c3e6cb';
+                
+                document.getElementById('totalSchools').innerText = 'कुल पंजीकृत स्कूल: ' + getUniqueSchoolsCount(allData);
+                document.getElementById('totalSchools').style.background = '#d4edda';
+                document.getElementById('totalSchools').style.color = '#155724';
+                document.getElementById('totalSchools').style.borderColor = '#c3e6cb';
+                
+                populateDropdown('pramandal', 'pramandal', allData, currP, '-- पहले प्रमंडल चुनें --');
+                
+                if(currP !== "All") {
+                    let pData = allData.filter(item => item.pramandal === currP);
+                    populateDropdown('district', 'district', pData, currD, '-- जिला चुनें --');
+                    document.getElementById('district').disabled = false;
+                    
+                    if(currD !== "All") {
+                        let dData = pData.filter(item => item.district === currD);
+                        populateDropdown('school', 'school', dData, currS, '-- स्कूल चुनें --');
+                        document.getElementById('school').disabled = false;
+                    }
+                }
+                
+                if(currP !== "All" && currD !== "All" && currS !== "All") {
+                    renderTable(currP, currD, currS);
+                }
+            }
+        } catch(e) {
+            console.error("Live fetch error", e);
+            document.getElementById('liveStatus').className = "offline-badge";
+            document.getElementById('liveStatus').innerHTML = '🔴 कुछ गड़बड़ी हुई है';
+        }
+    }
+
+    function populateDropdown(id, key, dataList, valueToSelect="All", defaultText="-- सभी --") {
+        const select = document.getElementById(id);
+        select.innerHTML = `<option value="All">${defaultText}</option>`;
+        
+        const uniqueValues = [...new Set(dataList.map(item => item[key]))].sort();
+        uniqueValues.forEach(val => {
+            if (val && val !== "N/A") {
+                let option = document.createElement("option");
+                option.value = val;
+                option.text = val;
+                select.add(option);
+            }
+        });
+        
+        if(uniqueValues.includes(valueToSelect)) {
+            select.value = valueToSelect;
+        } else {
+            select.value = "All";
+        }
+    }
+
+    function filterData(source) {
+        let pSelect = document.getElementById('pramandal');
+        let dSelect = document.getElementById('district');
+        let sSelect = document.getElementById('school');
+        
+        let selectedPramandal = pSelect.value;
+        let selectedDistrict = dSelect.value;
+        let selectedSchool = sSelect.value;
+
+        if (source === 'pramandal') {
+            if(selectedPramandal === "All") {
+                dSelect.innerHTML = '<option value="All">-- जिला चुनें --</option>';
+                sSelect.innerHTML = '<option value="All">-- स्कूल चुनें --</option>';
+                dSelect.disabled = true;
+                sSelect.disabled = true;
+            } else {
+                let pData = allData.filter(item => item.pramandal === selectedPramandal);
+                populateDropdown('district', 'district', pData, "All", '-- जिला चुनें --');
+                dSelect.disabled = false;
+                sSelect.innerHTML = '<option value="All">-- स्कूल चुनें --</option>';
+                sSelect.disabled = true;
+            }
+            selectedDistrict = "All";
+            selectedSchool = "All";
+        }
+        
+        if (source === 'district') {
+            if(selectedDistrict === "All") {
+                sSelect.innerHTML = '<option value="All">-- स्कूल चुनें --</option>';
+                sSelect.disabled = true;
+            } else {
+                let dData = allData.filter(item => item.pramandal === selectedPramandal && item.district === selectedDistrict);
+                populateDropdown('school', 'school', dData, "All", '-- स्कूल चुनें --');
+                sSelect.disabled = false;
+            }
+            selectedSchool = "All";
+        }
+
+        if (selectedPramandal !== "All" && selectedDistrict !== "All" && selectedSchool !== "All") {
+            renderTable(selectedPramandal, selectedDistrict, selectedSchool);
+        } else {
+            document.getElementById('tableContainer').style.display = 'none';
+            document.getElementById('instructionMsg').style.display = 'block';
+        }
+    }
+
+    function renderTable(p, d, s) {
+        document.getElementById('tableContainer').style.display = 'block';
+        document.getElementById('instructionMsg').style.display = 'none';
+        
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = "";
+        
+        let filtered = allData.filter(item => item.pramandal === p && item.district === d && item.school === s);
+        
+        document.getElementById('countInfo').innerText = `चयनित स्कूल के कुल शिक्षक: ${filtered.length}`;
+
+        filtered.forEach(item => {
+            let tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><strong>${item.slNo}</strong></td>
+                <td><strong>${item.teacher}</strong></td>
+                <td>${item.post}</td>
+                <td>${item.school}</td>
+                <td>${item.district}</td>
+                <td>${item.pramandal}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+</script>
+
+</body>
+</html>
