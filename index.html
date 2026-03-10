@@ -43,17 +43,17 @@
         th { background-color: #007bff; color: white; position: sticky; top: 0; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.4); z-index: 2; }
         tr:nth-child(even) { background-color: #f9f9f9; }
 
-        .correction-box { background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin-top: 30px; margin-bottom: 20px; }
-        .correction-box h5 { margin: 0 0 10px 0; color: #856404; font-size: 1em; line-height: 1.4; }
+        /* Application Box Styles */
+        .application-box { background: #e8f4fd; padding: 15px; border-radius: 8px; border: 1px solid #b8daff; margin-top: 30px; margin-bottom: 20px; }
+        .application-box h5 { margin: 0 0 10px 0; color: #004085; font-size: 1.05em; line-height: 1.4; }
         
-        /* New Information Text Style */
         .info-text { font-size: 0.9em; color: #d32f2f; font-weight: bold; margin-bottom: 10px; display: block; }
         
         .correction-inputs { display: flex; gap: 10px; flex-wrap: wrap; }
         .correction-inputs input { padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 100px; font-size: 14px; flex-grow: 1; }
         .correction-inputs textarea { padding: 10px; border: 1px solid #ccc; border-radius: 4px; flex: 3; min-width: 200px; font-size: 14px; resize: vertical; }
-        .correction-inputs button { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; flex-grow: 1; }
-        .correction-inputs button:hover { background: #218838; }
+        .correction-inputs button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; flex-grow: 1; }
+        .correction-inputs button:hover { background: #0056b3; }
         #correctionStatus { font-weight: bold; width: 100%; text-align: center; margin-top: 5px; font-size: 0.9em; }
         
         .dev-credit { text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e0e0e0; font-size: 0.9em; color: #555; line-height: 1.6; }
@@ -126,14 +126,15 @@
         </div>
     </div>
     
-    <div class="correction-box">
-        <h5>🛠️ क्या आपके डेटा में कोई गलती है? नीचे अपना 'Registration Sl No.' और सही जानकारी लिखकर भेजें:</h5>
+    <div class="application-box">
+        <h5>👑 क्या आप प्रमंडलीय संयोजक पद हेतु स्वयं को उपयुक्त समझते हैं? नीचे अपना 'Registration Sl No.' और आप स्वयं को क्यों योग्य समझते हैं, इसका संक्षिप्त विवरण भेजें:</h5>
+        
         <span class="info-text">👉 अपना 'Registration Sl No.' जानने के लिए ऊपर अपना नाम सर्च करके बाईं ओर देखें।</span>
         
         <div class="correction-inputs">
             <input type="number" id="corrRow" placeholder="Sl No." min="1" required>
-            <textarea id="corrText" rows="2" placeholder="जैसे: मेरा नाम गलत स्कूल में दिखा रहा है..." required></textarea>
-            <button onclick="sendCorrection()" id="corrBtn">सुधार भेजें 🚀</button>
+            <textarea id="corrText" rows="2" placeholder="मैं इस पद के लिए इसलिए योग्य हूँ क्योंकि..." required></textarea>
+            <button onclick="sendApplication()" id="corrBtn">आवेदन भेजें 🚀</button>
             <div id="correctionStatus"></div>
         </div>
     </div>
@@ -152,14 +153,14 @@
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbznQFYw0MghBENlilP2cAu2PMpLzi0W4RCfjGuvvhxyQMdeP1sMbeySmBhooBZtzKG9/exec"; 
     const GOOGLE_SHEET_ID = "18EazcZT9IFC3TrtzmiwyGAPAohl-pkw5ccI1m0O9b6g";
 
-    function sendCorrection() {
+    function sendApplication() {
         let userSlNo = document.getElementById('corrRow').value;
         let text = document.getElementById('corrText').value;
         let btn = document.getElementById('corrBtn');
         let status = document.getElementById('correctionStatus');
 
         if(userSlNo === "" || text.trim() === "") {
-            alert("कृपया Registration Sl No. और सुधार की जानकारी दोनों भरें!");
+            alert("कृपया Registration Sl No. और अपना विवरण दोनों भरें!");
             return;
         }
 
@@ -177,14 +178,16 @@
         status.style.color = "blue";
         status.innerText = "कृपया प्रतीक्षा करें...";
 
-        let finalUrl = WEB_APP_URL + "?rowNo=" + actualExcelRow + "&correction=" + encodeURIComponent(text);
+        // Adding a prefix so you know it's an application in the Google Sheet
+        let finalText = "संयोजक पद हेतु आवेदन: " + text;
+        let finalUrl = WEB_APP_URL + "?rowNo=" + actualExcelRow + "&correction=" + encodeURIComponent(finalText);
 
         fetch(finalUrl)
         .then(response => response.json())
         .then(data => {
             if(data.status === "success") {
                 status.style.color = "green";
-                status.innerText = "✅ सुधार रिक्वेस्ट सफलतापूर्वक भेज दी गई है!";
+                status.innerText = "✅ आपका विवरण सफलतापूर्वक भेज दिया गया है!";
                 document.getElementById('corrRow').value = "";
                 document.getElementById('corrText').value = "";
             } else {
@@ -199,7 +202,7 @@
         })
         .finally(() => {
             btn.disabled = false;
-            btn.innerText = "सुधार भेजें 🚀";
+            btn.innerText = "आवेदन भेजें 🚀";
             setTimeout(() => { status.innerText = ""; }, 5000);
         });
     }
@@ -263,7 +266,6 @@
                     let rawKey = String(key).trim();
                     let cleanKey = rawKey.toLowerCase().replace(/\./g, '').replace(/\s/g, ''); 
                     
-                    // Fixed matching logic based on the screenshot issues
                     if (cleanKey.includes('slno') || cleanKey.includes('serial') || cleanKey.includes('क्र')) {
                         slNo = String(row[key]).trim();
                     } else if (rawKey.includes('प्रमंडल')) {
@@ -279,10 +281,7 @@
                     }
                 }
                 
-                // Fallback: If 'teacher' is still 'N/A' but we have data that looks like a name, or if post has the name
-                // Based on your screenshot, it seems the name was going into 'post' or vice-versa due to column header naming
                 if (teacher === "N/A" && post !== "N/A" && !post.includes('अध्यापक')) {
-                     // Swap them if it looks like they got crossed
                      teacher = post;
                      post = "N/A";
                 }
